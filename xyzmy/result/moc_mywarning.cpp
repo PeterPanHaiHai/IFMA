@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mywarning.h'
 **
-** Created: Tue Dec 29 16:06:59 2015
+** Created: Wed Jan 6 19:13:31 2016
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.3)
 **
 ** WARNING! All changes made in this file will be lost!

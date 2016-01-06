@@ -1,4 +1,7 @@
 #include "onekeyimport.h"
+#include <QDebug>
+#include <QProcess>
+
 //use this file to import all file in SD card，将SD卡中所有信息文件导入到 ARM 板的nand flash中
 //here below is the content of the formula file
 //2 (x+0.0181)/0.001 3 ug 2012-10-30 1 2 3 4 5 6
@@ -91,6 +94,7 @@ float OneKeyImport::DetermineFormula(QString Project, QString Batch,float AT)
     //利用项目号和批次号来确定要使用的检测公式,根据面积比等将AT（检测线）／AC（控制线），返回物质的浓度
     //如果公式从SD卡导入到Flash的过程中，失败了，falsh中没有这些公式文件，那么直接判断SD卡是否存在，若存在
     //若存在，其中有没有该公式，若有则直接从中读取，否则提错
+    /*
     QString formula=showContent(Project,Batch,1);//取出公式
 
     QScriptEngine engine;
@@ -105,7 +109,22 @@ float OneKeyImport::DetermineFormula(QString Project, QString Batch,float AT)
     QScriptValue result=res.call(QScriptValue(),dataValue);
     //here change the formula
     float finalresult=result.toNumber();
+    return finalresult;
+    */
 
+    QString formula=showContent(Project,Batch,1);//取出公式
+    QString qstrExeDir =  "/opt/calculate.sh";
+    QStringList qstrlstParams;
+    qstrlstParams  << QString("%1").arg(AT)  <<  formula;                            //参数设置
+    QProcess *myProcess = new QProcess;
+    myProcess->start(qstrExeDir, qstrlstParams);                    //调用外部函数
+     myProcess->waitForFinished(300);                            //等待执行完毕，保证写读的先后顺序，毫秒数要设置足够
+    QByteArray qbaOutput =  myProcess->readAllStandardOutput();
+    QString qstrYouWant = qbaOutput;
+    qDebug() << "Params: " << qstrlstParams << "qstrYouWant:" << qstrYouWant;
+    double finalresult = qstrYouWant.toDouble();
+
+    delete myProcess;
     return finalresult;
 }
 
